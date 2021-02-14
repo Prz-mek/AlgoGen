@@ -1,14 +1,15 @@
 #include <cstdlib>
 
-#include "pigen.h"
+#include "sgen.hpp"
 
-// ----------------------------- Individual ---------------------------------------
+// --- Individual methods --- //
 
-Individual::Individual() {
-	chromosome = rand() % 0xFFFFF;		// troche nieelastyczne
+Individual::Individual(Graph g) {
+	graph = g;
+	chromosome = int [g.getVerticesNum() + 1];
 }
 
-int Individual::getChromosome() {
+int* Individual::getChromosome() {
 	return chromosome;
 }
 
@@ -17,17 +18,12 @@ void Individual::setChromosome(int x) {
 }
 
 double Individual::fitness() {
-	double x = chromosome & 0xFFC00;
-	x /= 1024;
-	x /= chromosome & 0x3FF;
-	x -= PI;
-	x = mfabs(x);
-	x = 1000 - x;
+	double x = 0;
 	
 	return x;
 }
 
-Individual Individual::hier(Individual partner) {	// Jeden podzial
+Individual Individual::hier(Individual partner) {
 	int length = rand() % 20;
 	short mask = 1;
 	for (int j = 0; j < length; j++) {
@@ -42,16 +38,9 @@ Individual Individual::hier(Individual partner) {	// Jeden podzial
 }
 
 Individual Individual::mutation() {
-	int mbit = rand() % 19;
-	mbit = 1 << mbit;
-	int ch = chromosome;
-	if (ch & mbit)
-		ch -= mbit;
-	else
-		ch += mbit;
+	int* ch = 
 
-	Individual x;
-	x.setChromosome(ch);
+	Individual x(graph);
 	return x;
 }
 
@@ -59,7 +48,7 @@ Individual::~Individual() {
 	chromosome = 0;
 }
 
-// ---------------------------- Population ----------------------------------------
+// --- Population methods --- //
 
 Population::Population() {
 	number = 8;
@@ -71,6 +60,10 @@ Population::Population(int n) {
 	number = n;
 	size = n;
 	ind = new Individual [size];
+}
+
+int Population::getSize() {
+	return size;
 }
 
 void Population::doubleSize() {
@@ -102,10 +95,7 @@ void Population::add(Individual n) {
 }
 
 Individual Population::get(int index) {
-	// if (index >= number)		// Nie wiem jak to poprawic
-	//	return NULL;
-	// else
-		return ind[index];
+	return ind[index];
 }
 
 void Population::selectionT(int n) {		// Powinna byc losowa ale tak bylo latwiej
